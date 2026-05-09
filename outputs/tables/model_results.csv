@@ -1,0 +1,5 @@
+Model,Accuracy,Precision,Recall,F1-Score,ROC-AUC,Notes
+Gradient Boosting,0.8198218771408997,0.850470035252644,0.9118110236220472,0.8800729594163247,0.8872792790436079,"Tuned with GridSearchCV. Best params: {'model__learning_rate': 0.1, 'model__max_depth': 4, 'model__n_estimators': 200, 'model__subsample': 0.8}"
+Random Forest,0.8102306462662708,0.8428905792861322,0.9074015748031496,0.873957227362354,0.8792672718235801,"Tuned with GridSearchCV. Best params: {'model__max_depth': 15, 'model__min_samples_leaf': 2, 'model__min_samples_split': 5, 'model__n_estimators': 200}"
+Decision Tree,0.8022379538707467,0.8476362541403192,0.8866141732283465,0.8666871921182266,0.8477705548434353,"Tuned with GridSearchCV. Best params: {'model__max_depth': 10, 'model__min_samples_leaf': 1, 'model__min_samples_split': 2}"
+Logistic Regression,0.775291162365837,0.8100764223039909,0.9014173228346457,0.853309481216458,0.8328893190676747,"Tuned with GridSearchCV. Best params: {'model__C': 0.01, 'model__solver': 'lbfgs'}"

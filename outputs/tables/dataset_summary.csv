@@ -1,0 +1,29 @@
+section,item,value
+dataset,original_rows,100077
+dataset,original_columns,20
+dataset,cleaned_rows,21891
+dataset,cleaned_columns,20
+dataset,feature_count,19
+dataset,target_column,phishing
+dtype,url_length,int64
+dtype,n_dots,int64
+dtype,n_hypens,int64
+dtype,n_underline,int64
+dtype,n_slash,int64
+dtype,n_questionmark,int64
+dtype,n_equal,int64
+dtype,n_at,int64
+dtype,n_and,int64
+dtype,n_exclamation,int64
+dtype,n_space,int64
+dtype,n_tilde,int64
+dtype,n_comma,int64
+dtype,n_plus,int64
+dtype,n_asterisk,int64
+dtype,n_hastag,int64
+dtype,n_dollar,int64
+dtype,n_percent,int64
+dtype,n_redirection,int64
+dtype,phishing,int64
+preview,head_rows_json,"[{'url_length': 37, 'n_dots': 3, 'n_hypens': 0, 'n_underline': 0, 'n_slash': 0, 'n_questionmark': 0, 'n_equal': 0, 'n_at': 0, 'n_and': 0, 'n_exclamation': 0, 'n_space': 0, 'n_tilde': 0, 'n_comma': 0, 'n_plus': 0, 'n_asterisk': 0, 'n_hastag': 0, 'n_dollar': 0, 'n_percent': 0, 'n_redirection': 0, 'phishing': 0}, {'url_length': 77, 'n_dots': 1, 'n_hypens': 0, 'n_underline': 0, 'n_slash': 0, 'n_questionmark': 0, 'n_equal': 0, 'n_at': 0, 'n_and': 0, 'n_exclamation': 0, 'n_space': 0, 'n_tilde': 0, 'n_comma': 0, 'n_plus': 0, 'n_asterisk': 0, 'n_hastag': 0, 'n_dollar': 0, 'n_percent': 0, 'n_redirection': 1, 'phishing': 1}, {'url_length': 126, 'n_dots': 4, 'n_hypens': 1, 'n_underline': 2, 'n_slash': 0, 'n_questionmark': 1, 'n_equal': 3, 'n_at': 0, 'n_and': 2, 'n_exclamation': 0, 'n_space': 0, 'n_tilde': 0, 'n_comma': 0, 'n_plus': 0, 'n_asterisk': 0, 'n_hastag': 0, 'n_dollar': 0, 'n_percent': 0, 'n_redirection': 1, 'phishing': 1}]"
+dataset,cleaned_shape,"(21891, 26)"

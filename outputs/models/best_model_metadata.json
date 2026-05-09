@@ -1,0 +1,38 @@
+{
+  "best_model_name": "Gradient Boosting",
+  "target_column": "phishing",
+  "feature_columns": [
+    "url_length",
+    "n_dots",
+    "n_hypens",
+    "n_underline",
+    "n_slash",
+    "n_questionmark",
+    "n_equal",
+    "n_at",
+    "n_and",
+    "n_exclamation",
+    "n_space",
+    "n_tilde",
+    "n_comma",
+    "n_plus",
+    "n_asterisk",
+    "n_hastag",
+    "n_dollar",
+    "n_percent",
+    "n_redirection",
+    "total_special_chars",
+    "symbol_ratio",
+    "has_redirect",
+    "has_at",
+    "slash_dot_ratio",
+    "url_length_log"
+  ],
+  "metrics": {
+    "Accuracy": 0.8198,
+    "Precision": 0.8505,
+    "Recall": 0.9118,
+    "F1-Score": 0.8801,
+    "ROC-AUC": 0.8873
+  }
+}
