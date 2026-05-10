@@ -9,7 +9,7 @@ import pandas as pd
 
 try:
     import seaborn as sns
-    sns.set_theme(style="whitegrid", palette="muted", font_scale=1.1)
+    sns.set_theme(style="whitegrid", palette="muted", font_scale=1.3)
 except ImportError:
     sns = None
 
@@ -87,50 +87,70 @@ def plot_class_distribution(target: pd.Series, output_path) -> None:
     _save_figure(output_path)
 
 
-def plot_feature_histograms(df: pd.DataFrame, feature_names, output_path) -> None:
+def plot_feature_histograms(df: pd.DataFrame, feature_names, output_path, top_n: int = 8) -> None:
     if not feature_names:
         return
-    rows = math.ceil(len(feature_names) / 2)
-    fig, axes = plt.subplots(rows, 2, figsize=(13, 4 * rows), squeeze=False)
+    # Select top_n features by absolute correlation with target, else by variance
+    names = list(feature_names)
+    if "phishing" in df.columns:
+        corrs = df[names].corrwith(df["phishing"]).abs().sort_values(ascending=False)
+        names = corrs.index[:top_n].tolist()
+    else:
+        variances = df[names].var().sort_values(ascending=False)
+        names = variances.index[:top_n].tolist()
+
+    rows = math.ceil(len(names) / 2)
+    fig, axes = plt.subplots(rows, 2, figsize=(10, 3.5 * rows), squeeze=False)
     axes = axes.flatten()
-    for ax, feature in zip(axes, feature_names):
+    for ax, feature in zip(axes, names):
         data = df[feature].dropna()
         p01 = data.quantile(0.01)
         p99 = data.quantile(0.99)
         plot_data = data.clip(lower=p01, upper=p99) if p99 > p01 else data
-        ax.hist(plot_data, bins=40, color=_PALETTE["lightblue"], edgecolor="white", alpha=0.9, zorder=3)
-        ax.set_title(feature, fontsize=10, fontweight="bold")
-        ax.set_xlabel(feature, fontsize=9)
-        ax.set_ylabel("Frequency", fontsize=9)
+        ax.hist(plot_data, bins=35, color=_PALETTE["lightblue"], edgecolor="white", alpha=0.9, zorder=3)
+        ax.set_title(feature, fontsize=12, fontweight="bold")
+        ax.set_xlabel(feature, fontsize=10)
+        ax.set_ylabel("Frequency", fontsize=10)
         ax.yaxis.grid(True, linestyle="--", alpha=0.6, zorder=0)
         ax.set_axisbelow(True)
-    for ax in axes[len(feature_names):]:
+        ax.tick_params(axis="both", labelsize=9)
+    for ax in axes[len(names):]:
         ax.axis("off")
-    fig.suptitle("Feature Distributions (clipped to 1st–99th percentile)", fontsize=13, fontweight="bold", y=1.01)
+    fig.suptitle("Top Feature Distributions (clipped to 1st–99th percentile)", fontsize=13, fontweight="bold", y=1.01)
     _save_figure(output_path)
 
 
-def plot_correlation_heatmap(df: pd.DataFrame, output_path) -> None:
-    correlation = df.corr(numeric_only=True)
-    fig, ax = plt.subplots(figsize=(13, 10))
+def plot_correlation_heatmap(df: pd.DataFrame, output_path, top_n: int = 15) -> None:
+    # Keep top_n features most correlated with target (+ target col itself)
+    num_df = df.select_dtypes(include="number")
+    if "phishing" in num_df.columns:
+        corrs = num_df.drop(columns=["phishing"]).corrwith(num_df["phishing"]).abs()
+        top_cols = corrs.sort_values(ascending=False).index[:top_n].tolist() + ["phishing"]
+        num_df = num_df[top_cols]
+    correlation = num_df.corr()
+    n = len(correlation)
+    size = max(9, n * 0.65)
+    fig, ax = plt.subplots(figsize=(size, size * 0.85))
     if sns is not None:
         sns.heatmap(
             correlation,
             cmap="coolwarm",
             center=0,
             square=True,
-            linewidths=0.4,
+            linewidths=0.5,
             annot=False,
             ax=ax,
         )
+        ax.tick_params(axis="both", labelsize=11)
     else:
         im = ax.imshow(correlation, cmap="coolwarm", aspect="auto")
         plt.colorbar(im, ax=ax)
-        ax.set_xticks(range(len(correlation.columns)))
-        ax.set_xticklabels(correlation.columns, rotation=90, fontsize=8)
-        ax.set_yticks(range(len(correlation.index)))
-        ax.set_yticklabels(correlation.index, fontsize=8)
-    ax.set_title("Feature Correlation Heatmap", fontsize=13, fontweight="bold", pad=12)
+        ax.set_xticks(range(n))
+        ax.set_xticklabels(correlation.columns, rotation=45, ha="right", fontsize=10)
+        ax.set_yticks(range(n))
+        ax.set_yticklabels(correlation.index, fontsize=10)
+    ax.set_title(f"Feature Correlation Heatmap (top {top_n} by target correlation)",
+                 fontsize=13, fontweight="bold", pad=12)
     _save_figure(output_path)
 
 
@@ -151,11 +171,12 @@ def plot_top_target_correlations(df: pd.DataFrame, target_col: str, output_path)
     ax.set_ylim(0, correlations.max() * 1.18)
     ax.yaxis.grid(True, linestyle="--", alpha=0.7, zorder=0)
     ax.set_axisbelow(True)
-    ax.tick_params(axis="x", rotation=45)
+    ax.tick_params(axis="x", rotation=45, labelsize=10)
+    ax.tick_params(axis="y", labelsize=10)
     for lbl in ax.get_xticklabels():
         lbl.set_ha("right")
         lbl.set_rotation_mode("anchor")
-    _annotate_bars(ax, fmt="{:.3f}", fontsize=8)
+    _annotate_bars(ax, fmt="{:.3f}", fontsize=9)
     _save_figure(output_path)
 
 
@@ -252,7 +273,7 @@ def plot_roc_curves(roc_curve_map, output_path) -> bool:
     return True
 
 
-def plot_feature_importance(model, feature_names, output_path, model_name: str) -> bool:
+def plot_feature_importance(model, feature_names, output_path, model_name: str, top_n: int = 10) -> bool:
     final_estimator = model.named_steps["model"]
     if not hasattr(final_estimator, "feature_importances_"):
         return False
@@ -260,20 +281,24 @@ def plot_feature_importance(model, feature_names, output_path, model_name: str) 
     importances = (
         pd.Series(final_estimator.feature_importances_, index=feature_names)
         .sort_values(ascending=False)
-        .head(15)
+        .head(top_n)
     )
     colors = [_PALETTE["yellow"] if imp >= importances.mean() else _PALETTE["lightblue"]
               for imp in importances.values]
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(10, 6))
     bars = ax.bar(importances.index, importances.values, color=colors, edgecolor="white", zorder=3)
-    ax.set_title(f"Top Feature Importances — {model_name}", fontsize=13, fontweight="bold", pad=10)
-    ax.set_ylabel("Importance Score", fontsize=11)
-    ax.set_xlabel("Feature", fontsize=11)
-    ax.set_ylim(0, importances.max() * 1.18)
+    ax.set_title(f"Top {top_n} Feature Importances — {model_name}", fontsize=14, fontweight="bold", pad=12)
+    ax.set_ylabel("Importance Score", fontsize=12)
+    ax.set_xlabel("Feature", fontsize=12)
+    ax.set_ylim(0, importances.max() * 1.20)
     ax.yaxis.grid(True, linestyle="--", alpha=0.7, zorder=0)
     ax.set_axisbelow(True)
-    ax.tick_params(axis="x", rotation=45)
-    _annotate_bars(ax, fmt="{:.4f}", fontsize=8)
+    ax.tick_params(axis="x", rotation=40, labelsize=11)
+    ax.tick_params(axis="y", labelsize=10)
+    for lbl in ax.get_xticklabels():
+        lbl.set_ha("right")
+        lbl.set_rotation_mode("anchor")
+    _annotate_bars(ax, fmt="{:.4f}", fontsize=9)
     _save_figure(output_path)
     return True
