@@ -97,8 +97,6 @@ The script will:
 ```
 .
 ├── data/                          # Dataset (not in repo — download from Kaggle)
-├── notebooks/
-│   └── 01_exploration_and_modeling.ipynb
 ├── outputs/
 │   ├── figures/                   # 9 generated PNG figures
 │   ├── models/                    # Model metadata JSON
@@ -107,7 +105,7 @@ The script will:
 │   ├── URL-Project.pdf            # IEEE-format final report
 │   └── URL-Project.docx           # Editable version
 ├── presentation/
-│   └── presentation_outline.md
+│   └── URL-Project-Presentation.pptx
 ├── src/
 │   ├── config.py                  # Paths and constants
 │   ├── data_loader.py
