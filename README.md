@@ -107,13 +107,10 @@ The script will:
 ├── presentation/
 │   └── URL-Project-Presentation.pptx
 ├── src/
-│   ├── config.py                  # Paths and constants
-│   ├── data_loader.py
-│   ├── preprocessing.py           # Duplicate removal + feature engineering
-│   ├── train_models.py
-│   ├── evaluate_models.py
-│   ├── visualize.py
-│   └── utils.py
+│   ├── config.py                  # Paths, constants, and IO helpers
+│   ├── data.py                    # Load, clean, summary tables, feature engineering, split, pipeline
+│   ├── models.py                  # Model specs, CV, GridSearchCV tuning, evaluation
+│   └── visualize.py               # Figure generation
 ├── run_experiment.py              # Main entry point
 └── requirements.txt
 ```

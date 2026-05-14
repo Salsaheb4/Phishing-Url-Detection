@@ -1,8 +1,15 @@
-from pathlib import Path
+"""Project paths, constants, and small IO helpers."""
+from __future__ import annotations
 
+import json
+from pathlib import Path
+from typing import Any, Iterable
+
+import pandas as pd
+
+# ── Paths ─────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
-NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 FIGURES_DIR = OUTPUTS_DIR / "figures"
 TABLES_DIR = OUTPUTS_DIR / "tables"
@@ -10,6 +17,7 @@ MODELS_DIR = OUTPUTS_DIR / "models"
 PAPER_DIR = PROJECT_ROOT / "paper"
 PRESENTATION_DIR = PROJECT_ROOT / "presentation"
 
+# ── Hyperparameters / experiment settings ─────────────────────────────
 RANDOM_STATE = 42
 TEST_SIZE = 0.20
 CV_FOLDS = 5
@@ -27,7 +35,7 @@ SELECTED_HISTOGRAM_FEATURES = (
     "slash_dot_ratio",
 )
 
-
+# ── Output file paths ─────────────────────────────────────────────────
 DATASET_SUMMARY_FILE = TABLES_DIR / "dataset_summary.csv"
 MISSING_VALUES_FILE = TABLES_DIR / "missing_values.csv"
 DUPLICATE_SUMMARY_FILE = TABLES_DIR / "duplicate_summary.csv"
@@ -49,3 +57,25 @@ FEATURE_IMPORTANCE_FIGURE = FIGURES_DIR / "feature_importance.png"
 BEST_MODEL_FILE = MODELS_DIR / "best_model.pkl"
 BEST_MODEL_METADATA_FILE = MODELS_DIR / "best_model_metadata.json"
 
+
+# ── IO helpers ────────────────────────────────────────────────────────
+def ensure_directories(paths: Iterable[Path]) -> None:
+    for path in paths:
+        path.mkdir(parents=True, exist_ok=True)
+
+
+def save_dataframe(df: pd.DataFrame, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, index=False)
+
+
+def save_json(data: dict[str, Any], path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as file_obj:
+        json.dump(data, file_obj, indent=2)
+
+
+def safe_metric(value: float | None) -> float | None:
+    if value is None or pd.isna(value):
+        return None
+    return round(float(value), 4)

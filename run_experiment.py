@@ -6,19 +6,26 @@ from pathlib import Path
 import joblib
 
 from src import config
-from src.data_loader import (
+from src.config import ensure_directories, save_dataframe, save_json, safe_metric
+from src.data import (
     build_class_distribution_table,
     build_dataset_summary_table,
     build_duplicate_summary_table,
     build_missing_values_table,
     detect_target_column,
+    engineer_features,
     load_dataset,
     prepare_dataset,
+    split_dataset,
 )
-from src.evaluate_models import evaluate_models, select_best_model
-from src.preprocessing import engineer_features, split_dataset
-from src.train_models import cross_validate_models, fit_models, get_cv, get_model_specs
-from src.utils import ensure_directories, save_dataframe, save_json, safe_metric
+from src.models import (
+    cross_validate_models,
+    evaluate_models,
+    fit_models,
+    get_cv,
+    get_model_specs,
+    select_best_model,
+)
 from src.visualize import (
     plot_class_distribution,
     plot_confusion_matrix,
@@ -58,7 +65,6 @@ def main():
     ensure_directories(
         [
             config.DATA_DIR,
-            config.NOTEBOOKS_DIR,
             config.FIGURES_DIR,
             config.TABLES_DIR,
             config.MODELS_DIR,
